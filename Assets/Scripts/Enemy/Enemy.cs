@@ -43,4 +43,8 @@ public class Enemy : MonoBehaviour
         return 0;
     }
 
+    public void SetTarget(Transform target) {
+        _target = target;
+    }
+
 }

@@ -10,6 +10,7 @@ public class PlayerShooting : MonoBehaviour
     [SerializeField] private GameObject _bulletPrefab;
     [SerializeField] private float _bulletSpeed;
     [SerializeField] private float _coolDown;
+    [SerializeField] private Spawner _spawner;
 
     private List<Enemy> _enemies = new List<Enemy>();
     private float _lastAttackTime;
@@ -40,7 +41,12 @@ public class PlayerShooting : MonoBehaviour
         foreach (GameObject _enemyObject in _enemyObjects) {
             _enemies.Add(_enemyObject.GetComponent<Enemy>());
         }
-        _enemies.Sort(Enemy.SortByDistance);
+
+        if (_enemies.Count > 0) {
+            _enemies.Sort(Enemy.SortByDistance);
+        } else {
+            _spawner.NoEnemiesLeft();
+        }
     }
 
     void OnDeath_RefreshTargetList(Health sender) {
