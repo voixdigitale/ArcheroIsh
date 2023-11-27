@@ -5,19 +5,19 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
-
+    [Header("Core Spawning")]
+    [SerializeField] List<BoxCollider2D> _spawnZones;
 
     [Header("Wave Spawning")]
     [SerializeField] private int _currentWave = 0;
     [SerializeField] private AnimationCurve _enemiesEachWave;
     [SerializeField, Range(0, 20)] private int _waveRecoveryBuffer = 5;
-    [SerializeField, Range(0, 20)] private float _spawnRadius = 3.0f;
-    [SerializeField, Range(1, 20)] private float _spawnInnerRadius = 1.0f;
 
     [Header("References")]
     [SerializeField] Transform _enemyPrefab;
     [SerializeField] private Transform _player;
     [SerializeField] private TextMeshProUGUI _waveText;
+    [SerializeField] private TextMeshProUGUI _waveDisplay;
 
     private bool _allEnemiesSpawned;
     private bool _enemiesExist;
@@ -52,21 +52,19 @@ public class Spawner : MonoBehaviour
         int seconds = _waveRecoveryBuffer / 1;
         for (int s = seconds; s > 0; s--) {
             yield return new WaitForSeconds(1);
-            _waveText.SetText(s == seconds ? "Prepare !" : s.ToString());
+            _waveText.SetText(s == seconds ? $"Prepare for wave {GameManager.Instance._currentWave + 1}" : s.ToString());
         }
         _waveText.SetText(string.Empty);
+        _waveDisplay.SetText($"Wave {GameManager.Instance._currentWave + 1}");
         StartNewWave();
     }
 
     private IEnumerator ManageEnemySpawning(int numberInSpawn) {
-        Debug.Log("About to Spawn " + numberInSpawn);
         yield return new WaitForSeconds(.3f);
 
         int spawnedEnemies = 0;
         while (_canSpawn && spawnedEnemies < numberInSpawn) {
-            Vector2 randomPos = Random.insideUnitCircle * _spawnRadius;
-            randomPos.x += _spawnInnerRadius;
-            randomPos.y += _spawnInnerRadius;
+            Vector2 randomPos = GenerateRandomSpawnPoint();
             Transform enemy = Instantiate(_enemyPrefab, randomPos, Quaternion.identity);
             enemy.GetComponent<Enemy>().SetTarget(_player);
             spawnedEnemies++;
@@ -75,9 +73,11 @@ public class Spawner : MonoBehaviour
         _allEnemiesSpawned = true;
     }
 
-    private void OnDrawGizmos() {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(Vector2.zero, _spawnRadius);
-        Gizmos.DrawWireSphere(Vector2.zero, _spawnInnerRadius);
+    private Vector2 GenerateRandomSpawnPoint() {
+        int zone = Random.Range(0, _spawnZones.Count);
+        float posX = Random.Range(_spawnZones[zone].bounds.min.x, _spawnZones[zone].bounds.max.x);
+        float posY = Random.Range(_spawnZones[zone].bounds.min.y, _spawnZones[zone].bounds.max.y);
+
+        return new Vector2(posX, posY);
     }
 }

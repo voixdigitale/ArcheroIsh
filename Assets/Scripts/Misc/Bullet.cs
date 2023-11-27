@@ -24,6 +24,9 @@ public class Bullet : MonoBehaviour
         if (collision.gameObject.tag == "Enemy" || Time.time > _dropTimer) {
             _sprite.color = Color.white;
 
+            if (collision.gameObject.tag == "Enemy")
+                collision.gameObject.GetComponent<Animator>().SetTrigger("IsHit");
+
             Health enemyHealth = collision.gameObject.GetComponent<Health>();
             enemyHealth?.ReduceHealth(1);
         }   

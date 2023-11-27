@@ -14,7 +14,7 @@ TagManager:
   - Water
   - UI
   - Enemy
-  - 
+  - Particles
   - 
   - 
   - 
@@ -40,6 +40,9 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Background
+    uniqueID: 1848845259
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
