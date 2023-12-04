@@ -8,6 +8,6 @@ public class GameOverUI : MonoBehaviour
     public void TapToRestart() {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         Time.timeScale = 1.0f;
-        GameManager.Instance._currentWave = 0;
+        GameManager.Instance.CurrentWave = 0;
     }
 }

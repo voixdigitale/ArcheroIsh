@@ -10,11 +10,11 @@ public class ScoreManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _scoreText;
 
     private void OnEnable() {
-        Health.OnDeath += OnDeath_Counter;
+        Health.OnHit += OnHit_Counter;
     }
 
     private void OnDisable() {
-        Health.OnDeath -= OnDeath_Counter;
+        Health.OnHit -= OnHit_Counter;
     }
 
 
@@ -28,7 +28,7 @@ public class ScoreManager : MonoBehaviour
         _scoreText.SetText("Score: " + _score.ToString(fmt));
     }
 
-    private void OnDeath_Counter(Health sender) {
+    private void OnHit_Counter(Health sender) {
         _score++;
         UpdateScore();
     }

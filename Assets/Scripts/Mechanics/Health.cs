@@ -6,6 +6,7 @@ using UnityEngine;
 public class Health : MonoBehaviour
 {
     public static Action<Health> OnDeath;
+    public static Action<Health> OnHit;
 
     [SerializeField] private int _startingHealth = 100;
     [SerializeField] private int _currentHealth;
@@ -20,6 +21,7 @@ public class Health : MonoBehaviour
 
     public void ReduceHealth(int amount) {
         _currentHealth -= amount;
+        OnHit?.Invoke(this);
 
         if (_currentHealth <= 0) {
             OnDeath?.Invoke(this);

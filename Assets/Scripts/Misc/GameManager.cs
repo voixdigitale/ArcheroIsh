@@ -3,20 +3,14 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Game Manager", menuName = "Scriptable Objects/Game Manager")]
-    public class GameManager : ScriptableObject {
+    public class GameManager : MonoBehaviour {
     
-    public int _currentWave;
+    public int CurrentWave;
+    public int CurrentBulletSpeed;
 
-    private static GameManager _inst;
+    public static GameManager Instance;
 
-    public static GameManager Instance {
-        get {
-            if (!_inst)
-                _inst = Object.FindObjectOfType<GameManager>();
-            if (!_inst)
-                _inst = CreateInstance<GameManager>();
-            return _inst;
-        }
+    private void Awake() {
+        Instance = this;
     }
 }

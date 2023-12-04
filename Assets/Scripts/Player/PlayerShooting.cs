@@ -8,7 +8,6 @@ using static UnityEngine.GraphicsBuffer;
 public class PlayerShooting : MonoBehaviour
 {
     [SerializeField] private GameObject _bulletPrefab;
-    [SerializeField] private float _bulletSpeed;
     [SerializeField] private float _coolDown;
     [SerializeField] private Spawner _spawner;
 
@@ -32,7 +31,7 @@ public class PlayerShooting : MonoBehaviour
         _lastAttackTime = Time.time + _coolDown;
         var bullet = Instantiate(_bulletPrefab, transform.position, Quaternion.identity);
         Vector2 relativePos = transform.InverseTransformPoint(_enemies.First().transform.position).normalized;
-        bullet.GetComponent<Rigidbody2D>().AddForce(relativePos * _bulletSpeed);
+        bullet.GetComponent<Rigidbody2D>().AddForce(relativePos * GameManager.Instance.CurrentBulletSpeed);
     }
 
     void RefreshTargetList() {

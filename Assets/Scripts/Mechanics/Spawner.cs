@@ -7,6 +7,14 @@ public class Spawner : MonoBehaviour
 {
     [Header("Core Spawning")]
     [SerializeField] List<BoxCollider2D> _spawnZones;
+    [SerializeField] Transform _furniture;
+
+    [SerializeField] private bool _timedWave;
+    [SerializeField] private int _maxTimeInSeconds;
+    [SerializeField] private int _maxSpawnRate;
+    [SerializeField] private int _maxSpawnNumber;
+    [SerializeField] private AnimationCurve _enemyCurve;
+    [SerializeField] private AnimationCurve _enemySpawnRate;
 
     [Header("Wave Spawning")]
     [SerializeField] private int _currentWave = 0;
@@ -22,15 +30,27 @@ public class Spawner : MonoBehaviour
     private bool _allEnemiesSpawned;
     private bool _enemiesExist;
     private bool _canSpawn = true;
+    private float _nextSpawnTimer;
 
 
     private void Start() {
+        if (_timedWave) {
+            _nextSpawnTimer = GetNextEnemySpawnTime();
+        }
+        
         StartCoroutine(BetweenWaveBuffer());
     }
 
     void Update()
     {
-        if (_allEnemiesSpawned && !_enemiesExist && _canSpawn) {
+        if (_timedWave) {
+            _nextSpawnTimer -= Time.deltaTime;
+            if (_nextSpawnTimer <= 0 ) {
+                _nextSpawnTimer = GetNextEnemySpawnTime();
+                StartCoroutine(ManageEnemySpawning(GetEnemiesToSpawn()));
+            }
+
+        } else if (_allEnemiesSpawned && !_enemiesExist && _canSpawn) {
             StopAllCoroutines();
             StartCoroutine(BetweenWaveBuffer());
         }
@@ -41,21 +61,48 @@ public class Spawner : MonoBehaviour
     }
 
     private void StartNewWave() {
-        int enemyQuantity = Mathf.RoundToInt(_enemiesEachWave.Evaluate(++GameManager.Instance._currentWave - 1));
+        RandomizeFurniture();
 
-        StartCoroutine(ManageEnemySpawning(enemyQuantity));
+        StartCoroutine(ManageEnemySpawning(GetEnemiesToSpawn()));
     }
 
+    private void RandomizeFurniture() {
+        foreach (Transform child in _furniture) {
+            child.gameObject.SetActive(Random.value > 0.5f);
+        }
+    }
+
+    private float GetNextEnemySpawnTime() {
+        return _maxSpawnRate * _enemySpawnRate.Evaluate(Time.time / _maxTimeInSeconds);
+    }
+
+    private int GetEnemiesToSpawn() {
+        int enemyQuantity;
+
+        if (!_timedWave) {
+            enemyQuantity = Mathf.RoundToInt(_enemiesEachWave.Evaluate(++GameManager.Instance.CurrentWave - 1));
+        } else {
+            enemyQuantity = 1 + (int) (_maxSpawnNumber * _enemyCurve.Evaluate(Time.time / _maxTimeInSeconds));
+        }
+
+        return enemyQuantity;
+    }
 
     private IEnumerator BetweenWaveBuffer() {
         _allEnemiesSpawned = false;
         int seconds = _waveRecoveryBuffer / 1;
         for (int s = seconds; s > 0; s--) {
             yield return new WaitForSeconds(1);
-            _waveText.SetText(s == seconds ? $"Prepare for wave {GameManager.Instance._currentWave + 1}" : s.ToString());
+            if (_timedWave) {
+                _waveText.SetText(s == seconds ? $"Ready?" : s.ToString());
+            } else {
+                _waveText.SetText(s == seconds ? $"Prepare for wave {GameManager.Instance.CurrentWave + 1}" : s.ToString());
+            }
         }
         _waveText.SetText(string.Empty);
-        _waveDisplay.SetText($"Wave {GameManager.Instance._currentWave + 1}");
+        if (!_timedWave) {
+            _waveDisplay.SetText($"Wave {GameManager.Instance.CurrentWave + 1}");
+        }
         StartNewWave();
     }
 
