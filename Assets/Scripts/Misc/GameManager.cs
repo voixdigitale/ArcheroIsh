@@ -7,7 +7,7 @@ using UnityEngine;
     
     public int CurrentWave;
     public int CurrentBulletSpeed;
-
+    public GameObject Player;
     public static GameManager Instance;
 
     private void Awake() {

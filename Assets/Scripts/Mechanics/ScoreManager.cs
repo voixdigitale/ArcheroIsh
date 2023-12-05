@@ -8,6 +8,7 @@ public class ScoreManager : MonoBehaviour
 {
     [SerializeField] private int _score;
     [SerializeField] private TextMeshProUGUI _scoreText;
+    [SerializeField] private GameObject _rewardsPanel;
 
     private void OnEnable() {
         Health.OnHit += OnHit_Counter;
@@ -24,12 +25,41 @@ public class ScoreManager : MonoBehaviour
     }
 
     private void UpdateScore() {
-        string fmt = "00000";
-        _scoreText.SetText("Score: " + _score.ToString(fmt));
+        string fmt = "0000000";
+        _scoreText.SetText(_score.ToString(fmt));
     }
 
     private void OnHit_Counter(Health sender) {
         _score++;
         UpdateScore();
+
+        if (_score % 450 == 0) {
+            Time.timeScale = 0;
+            _rewardsPanel.SetActive(true);
+        }
+    }
+
+    public void BoostWater() {
+        PlayerShooting ps = GameManager.Instance.Player.GetComponent<PlayerShooting>();
+        ps.SetProjectileReach(ps.GetProjectileReach() * 1.1f);
+
+        RadiusRenderer r = GameManager.Instance.Player.GetComponent<RadiusRenderer>();
+        r.xradius *= 1.1f;
+        r.yradius *= 1.1f;
+        r.CreatePoints();
+
+        _rewardsPanel.SetActive(false);
+        Time.timeScale = 1.0f;
+    }
+
+    public void ScaleDownPlayer() {
+        GameManager.Instance.Player.transform.localScale *= .9f;
+        RadiusRenderer r = GameManager.Instance.Player.GetComponent<RadiusRenderer>();
+        r.xradius *= 1.1f;
+        r.yradius *= 1.1f;
+        r.CreatePoints();
+
+        _rewardsPanel.SetActive(false);
+        Time.timeScale = 1.0f;
     }
 }

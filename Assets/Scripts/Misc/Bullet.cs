@@ -31,4 +31,8 @@ public class Bullet : MonoBehaviour
             enemyHealth?.ReduceHealth(1);
         }   
     }
+
+    public void SetReach(float reach) {
+        _liveTime = reach;
+    }
 }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Spawner : MonoBehaviour
 {
@@ -26,6 +27,7 @@ public class Spawner : MonoBehaviour
     [SerializeField] private Transform _player;
     [SerializeField] private TextMeshProUGUI _waveText;
     [SerializeField] private TextMeshProUGUI _waveDisplay;
+    [SerializeField] private GameObject _countdownPrefab;
 
     private bool _allEnemiesSpawned;
     private bool _enemiesExist;
@@ -91,14 +93,17 @@ public class Spawner : MonoBehaviour
     private IEnumerator BetweenWaveBuffer() {
         _allEnemiesSpawned = false;
         int seconds = _waveRecoveryBuffer / 1;
-        for (int s = seconds; s > 0; s--) {
+        for (int s = seconds; s >= 0; s--) {
             yield return new WaitForSeconds(1);
+            _countdownPrefab.SetActive(true);
             if (_timedWave) {
+                _countdownPrefab.GetComponent<Image>().enabled = (s == seconds ? false : true);
                 _waveText.SetText(s == seconds ? $"Ready?" : s.ToString());
             } else {
                 _waveText.SetText(s == seconds ? $"Prepare for wave {GameManager.Instance.CurrentWave + 1}" : s.ToString());
             }
         }
+        _countdownPrefab.SetActive(false);
         _waveText.SetText(string.Empty);
         if (!_timedWave) {
             _waveDisplay.SetText($"Wave {GameManager.Instance.CurrentWave + 1}");

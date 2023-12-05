@@ -19,7 +19,7 @@ public class RadiusRenderer : MonoBehaviour {
         CreatePoints();
     }
 
-    void CreatePoints() {
+    public void CreatePoints() {
         float x;
         float y;
         float z;
